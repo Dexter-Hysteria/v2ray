@@ -26,7 +26,7 @@ JSON_PATH='/etc/v2ray/'
 
 # Gobal verbals
 
-if [[ -f '/etc/systemd/system/xray.service' ]] && [[ -f '/usr/local/bin/xray' ]]; then
+if [[ -f '/etc/systemd/system/v2ray.service' ]] && [[ -f '/usr/local/lib/v2ray' ]]; then
   XRAY_IS_INSTALLED_BEFORE_RUNNING_SCRIPT=1
 else
   XRAY_IS_INSTALLED_BEFORE_RUNNING_SCRIPT=0
@@ -323,8 +323,8 @@ judgment_parameters() {
 
 check_install_user() {
   if [[ -z "$INSTALL_USER" ]]; then
-    if [[ -f '/usr/local/bin/xray' ]]; then
-      INSTALL_USER="$(grep '^[ '$'\t]*User[ '$'\t]*=' /etc/systemd/system/xray.service | tail -n 1 | awk -F = '{print $2}' | awk '{print $1}')"
+    if [[ -f '/usr/local/lib/v2ray' ]]; then
+      INSTALL_USER="$(grep '^[ '$'\t]*User[ '$'\t]*=' /etc/systemd/system/v2ray.service | tail -n 1 | awk -F = '{print $2}' | awk '{print $1}')"
       if [[ -z "$INSTALL_USER" ]]; then
         INSTALL_USER='root'
       fi
@@ -354,8 +354,8 @@ install_software() {
 
 get_current_version() {
   # Get the CURRENT_VERSION
-  if [[ -f '/usr/local/bin/xray' ]]; then
-    CURRENT_VERSION="$(/usr/local/bin/xray -version | awk 'NR==1 {print $2}')"
+  if [[ -f '/usr/local/lib/v2ray' ]]; then
+    CURRENT_VERSION="$(/usr/local/lib/v2ray -version | awk 'NR==1 {print $2}')"
     CURRENT_VERSION="v${CURRENT_VERSION#v}"
   else
     CURRENT_VERSION=""
@@ -506,8 +506,8 @@ install_xray() {
 }
 
 install_startup_service_file() {
-  mkdir -p '/etc/systemd/system/xray.service.d'
-  mkdir -p '/etc/systemd/system/xray@.service.d/'
+  mkdir -p '/etc/systemd/system/v2ray.service.d'
+  mkdir -p '/etc/systemd/system/v2ray@.service/'
   local temp_CapabilityBoundingSet="CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE"
   local temp_AmbientCapabilities="AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE"
   local temp_NoNewPrivileges="NoNewPrivileges=true"
@@ -516,7 +516,7 @@ install_startup_service_file() {
     temp_AmbientCapabilities="#${temp_AmbientCapabilities}"
     temp_NoNewPrivileges="#${temp_NoNewPrivileges}"
   fi
-cat > /etc/systemd/system/xray.service << EOF
+cat > /etc/systemd/system/v2ray.service << EOF
 [Unit]
 Description=Xray Service
 Documentation=https://github.com/xtls
@@ -527,7 +527,7 @@ User=$INSTALL_USER
 ${temp_CapabilityBoundingSet}
 ${temp_AmbientCapabilities}
 ${temp_NoNewPrivileges}
-ExecStart=/usr/local/bin/xray run -config /etc/v2rayconfig.json
+ExecStart=/usr/local/lib/v2ray run -config /usr/local/etc/xray/config.json
 Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
@@ -536,7 +536,7 @@ LimitNOFILE=1000000
 [Install]
 WantedBy=multi-user.target
 EOF
-cat > /etc/systemd/system/xray@.service <<EOF
+cat > /etc/systemd/system/v2ray@.service <<EOF
 [Unit]
 Description=Xray Service
 Documentation=https://github.com/xtls
@@ -547,7 +547,7 @@ User=$INSTALL_USER
 ${temp_CapabilityBoundingSet}
 ${temp_AmbientCapabilities}
 ${temp_NoNewPrivileges}
-ExecStart=/usr/local/bin/xray run -config /usr/local/etc/xray/%i.json
+ExecStart=/usr/local/lib/v2ray run -config /usr/local/etc/xray/%i.json
 Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
@@ -556,49 +556,49 @@ LimitNOFILE=1000000
 [Install]
 WantedBy=multi-user.target
 EOF
-  chmod 644 /etc/systemd/system/xray.service /etc/systemd/system/xray@.service
+  chmod 644 /etc/systemd/system/v2ray.service /etc/systemd/system/v2ray@.service
   if [[ -n "$JSONS_PATH" ]]; then
-    "rm" '/etc/systemd/system/xray.service.d/10-donot_touch_single_conf.conf' \
-      '/etc/systemd/system/xray@.service.d/10-donot_touch_single_conf.conf'
+    "rm" '/etc/systemd/system/v2ray.service.d/10-donot_touch_single_conf.conf' \
+      '/etc/systemd/system/v2ray@.service/10-donot_touch_single_conf.conf'
     echo "# In case you have a good reason to do so, duplicate this file in the same directory and make your customizes there.
 # Or all changes you made will be lost!  # Refer: https://www.freedesktop.org/software/systemd/man/systemd.unit.html
 [Service]
 ExecStart=
-ExecStart=/usr/local/bin/xray run -confdir $JSONS_PATH" |
-      tee '/etc/systemd/system/xray.service.d/10-donot_touch_multi_conf.conf' > \
-        '/etc/systemd/system/xray@.service.d/10-donot_touch_multi_conf.conf'
+ExecStart=/usr/local/lib/v2ray run -confdir $JSONS_PATH" |
+      tee '/etc/systemd/system/v2ray.service.d/10-donot_touch_multi_conf.conf' > \
+        '/etc/systemd/system/v2ray@.service.d/10-donot_touch_multi_conf.conf'
   else
-    "rm" '/etc/systemd/system/xray.service.d/10-donot_touch_multi_conf.conf' \
-      '/etc/systemd/system/xray@.service.d/10-donot_touch_multi_conf.conf'
+    "rm" '/etc/systemd/system/v2ray.service.d/10-donot_touch_multi_conf.conf' \
+      '/etc/systemd/system/v2ray@.service.d/10-donot_touch_multi_conf.conf'
     echo "# In case you have a good reason to do so, duplicate this file in the same directory and make your customizes there.
 # Or all changes you made will be lost!  # Refer: https://www.freedesktop.org/software/systemd/man/systemd.unit.html
 [Service]
 ExecStart=
-ExecStart=/usr/local/bin/xray run -config ${JSON_PATH}/config.json" > \
-      '/etc/systemd/system/xray.service.d/10-donot_touch_single_conf.conf'
+ExecStart=/usr/local/lib/v2ray run -config ${JSON_PATH}/config.json" > \
+      '/etc/systemd/system/v2ray.service.d/10-donot_touch_single_conf.conf'
     echo "# In case you have a good reason to do so, duplicate this file in the same directory and make your customizes there.
 # Or all changes you made will be lost!  # Refer: https://www.freedesktop.org/software/systemd/man/systemd.unit.html
 [Service]
 ExecStart=
-ExecStart=/usr/local/bin/xray run -config ${JSON_PATH}/%i.json" > \
-      '/etc/systemd/system/xray@.service.d/10-donot_touch_single_conf.conf'
+ExecStart=/usr/local/lib/v2ray run -config ${JSON_PATH}/%i.json" > \
+      '/etc/systemd/system/v2ray@.service.d/10-donot_touch_single_conf.conf'
   fi
   echo "info: Systemd service files have been installed successfully!"
   echo "${red}warning: ${green}The following are the actual parameters for the xray service startup."
   echo "${red}warning: ${green}Please make sure the configuration file path is correctly set.${reset}"
-  systemd_cat_config /etc/systemd/system/xray.service
+  systemd_cat_config /etc/systemd/system/v2ray.service
   # shellcheck disable=SC2154
   if [[ "${check_all_service_files:0:1}" = 'y' ]]; then
     echo
     echo
-    systemd_cat_config /etc/systemd/system/xray@.service
+    systemd_cat_config /etc/systemd/system/v2ray@.service
   fi
   systemctl daemon-reload
   SYSTEMD='1'
 }
 
 start_xray() {
-  if [[ -f '/etc/systemd/system/xray.service' ]]; then
+  if [[ -f '/etc/systemd/system/v2ray.service' ]]; then
     systemctl start "${XRAY_CUSTOMIZE:-xray}"
     sleep 1s
     if systemctl -q is-active "${XRAY_CUSTOMIZE:-xray}"; then
@@ -721,7 +721,7 @@ remove_xray() {
     if [[ -n "$(pidof xray)" ]]; then
       stop_xray
     fi
-    local delete_files=('/usr/local/bin/xray' '/etc/systemd/system/xray.service' '/etc/systemd/system/xray@.service' '/etc/systemd/system/xray.service.d' '/etc/systemd/system/xray@.service.d')
+    local delete_files=('/usr/local/lib/v2ray' '/etc/systemd/system/v2ray.service' '/etc/systemd/system/v2ray@.service' '/etc/systemd/system/v2ray.service.d' '/etc/systemd/system/v2ray@.service.d')
     [[ -d "$DAT_PATH" ]] && delete_files+=("$DAT_PATH")
     [[ -f '/etc/logrotate.d/xray' ]] && delete_files+=('/etc/logrotate.d/xray')
     if [[ "$PURGE" -eq '1' ]]; then
@@ -886,8 +886,8 @@ main() {
     fi
   fi
   install_xray
-  [[ "$N_UP_SERVICE" -eq '1' && -f '/etc/systemd/system/xray.service' ]] || install_startup_service_file
-  echo 'installed: /usr/local/bin/xray'
+  [[ "$N_UP_SERVICE" -eq '1' && -f '/etc/systemd/system/v2ray.service' ]] || install_startup_service_file
+  echo 'installed: /usr/local/lib/v2ray'
   # If the file exists, the content output of installing or updating geoip.dat and geosite.dat will not be displayed
   if [[ "$GEODATA" -eq '1' ]]; then
     echo "installed: ${DAT_PATH}/geoip.dat"
@@ -930,8 +930,8 @@ main() {
     fi
   fi
   if [[ "$SYSTEMD" -eq '1' ]]; then
-    echo 'installed: /etc/systemd/system/xray.service'
-    echo 'installed: /etc/systemd/system/xray@.service'
+    echo 'installed: /etc/systemd/system/v2ray.service'
+    echo 'installed: /etc/systemd/system/v2ray@.service'
   fi
   "rm" -r "$TMP_DIRECTORY"
   echo "removed: $TMP_DIRECTORY"
