@@ -9,12 +9,12 @@
 #	Official document: www.v2ray.com
 #====================================================
 
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-stty erase ^?
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
 cd "$(
-  cd "$(dirname "$0")" || exit
-  pwd
+    cd "$(dirname "$0")" || exit
+    pwd
 )" || exit
 
 #fonts color
@@ -312,12 +312,12 @@ v2ray_install() {
     fi
     mkdir -p /root/v2ray
     cd /root/v2ray || exit
-    wget -N --no-check-certificate https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/tls/v2ay.sh
+    wget -N --no-check-certificate https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/tls/v2.sh
 
-    if [[ -f v2ray.sh ]]; then
+    if [[ -f v2.sh ]]; then
         rm -rf $v2ray_systemd_file
         systemctl daemon-reload
-        bash v2ray.sh --force
+        bash v2.sh --force
         judge "Install V2ray"
     else
         echo -e "${Error} ${RedBG} V2ray installation file download failed, please check if the download address is available ${Font}"
@@ -422,7 +422,7 @@ ssl_install() {
 }
 
 domain_check() {
-    read -rp "Please enter your domain name information (eg: www.dextereskalarte.com):" domain
+    read -rp "Please enter your domain name information (eg: www.wulabing.com):" domain
     domain_ip=$(curl -sm8 https://ipget.net/?ip="${domain}")
     echo -e "${OK} ${GreenBG} is obtaining public network IP information, please wait patiently ${Font}"
     wgcfv4_status=$(curl -s4m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
