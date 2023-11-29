@@ -457,7 +457,7 @@ decompression() {
 
 install_file() {
   NAME="$1"
-  if [[ "$NAME" == 'xray' ]]; then
+  if [[ "$NAME" == 'v2ray' ]]; then
     install -m 755 "${TMP_DIRECTORY}/$NAME" "/usr/local/bin/$NAME"
   elif [[ "$NAME" == 'geoip.dat' ]] || [[ "$NAME" == 'geosite.dat' ]]; then
     install -m 644 "${TMP_DIRECTORY}/$NAME" "${DAT_PATH}/$NAME"
@@ -494,13 +494,13 @@ install_xray() {
 
   # Used to store Xray log files
   if [[ "$NO_LOGFILES" -eq '0' ]]; then
-    if [[ ! -d '/var/log/xray/' ]]; then
-      install -d -m 700 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /var/log/xray/
-      install -m 600 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /dev/null /var/log/xray/access.log
-      install -m 600 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /dev/null /var/log/xray/error.log
+    if [[ ! -d '/var/log/v2ray/' ]]; then
+      install -d -m 700 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /var/log/v2ray/
+      install -m 600 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /dev/null /var/log/v2ray/access.log
+      install -m 600 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /dev/null /var/log/v2ray/error.log
       LOG='1'
     else
-      chown -R "$INSTALL_USER_UID:$INSTALL_USER_GID" /var/log/xray/
+      chown -R "$INSTALL_USER_UID:$INSTALL_USER_GID" /var/log/v2ray/
     fi
   fi
 }
@@ -527,7 +527,7 @@ User=$INSTALL_USER
 ${temp_CapabilityBoundingSet}
 ${temp_AmbientCapabilities}
 ${temp_NoNewPrivileges}
-ExecStart=/usr/local/lib/v2ray run -config /usr/local/etc/xray/config.json
+ExecStart=/usr/local/lib/v2ray run -config /usr/local/etc/v2ray/config.json
 Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
@@ -547,7 +547,7 @@ User=$INSTALL_USER
 ${temp_CapabilityBoundingSet}
 ${temp_AmbientCapabilities}
 ${temp_NoNewPrivileges}
-ExecStart=/usr/local/lib/v2ray run -config /usr/local/etc/xray/%i.json
+ExecStart=/usr/local/lib/v2ray run -config /usr/local/etc/v2ray/%i.json
 Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
@@ -584,7 +584,7 @@ ExecStart=/usr/local/lib/v2ray run -config ${JSON_PATH}/%i.json" > \
       '/etc/systemd/system/v2ray@.service.d/10-donot_touch_single_conf.conf'
   fi
   echo "info: Systemd service files have been installed successfully!"
-  echo "${red}warning: ${green}The following are the actual parameters for the xray service startup."
+  echo "${red}warning: ${green}The following are the actual parameters for the v2ray service startup."
   echo "${red}warning: ${green}Please make sure the configuration file path is correctly set.${reset}"
   systemd_cat_config /etc/systemd/system/v2ray.service
   # shellcheck disable=SC2154
@@ -599,29 +599,29 @@ ExecStart=/usr/local/lib/v2ray run -config ${JSON_PATH}/%i.json" > \
 
 start_xray() {
   if [[ -f '/etc/systemd/system/v2ray.service' ]]; then
-    systemctl start "${XRAY_CUSTOMIZE:-xray}"
+    systemctl start "${XRAY_CUSTOMIZE:-v2ray}"
     sleep 1s
-    if systemctl -q is-active "${XRAY_CUSTOMIZE:-xray}"; then
-      echo 'info: Start the Xray service.'
+    if systemctl -q is-active "${XRAY_CUSTOMIZE:-v2ray}"; then
+      echo 'info: Start the v2ray service.'
     else
-      echo 'error: Failed to start Xray service.'
+      echo 'error: Failed to start v2ray service.'
       exit 1
     fi
   fi
 }
 
 stop_xray() {
-  XRAY_CUSTOMIZE="$(systemctl list-units | grep 'xray@' | awk -F ' ' '{print $1}')"
+  XRAY_CUSTOMIZE="$(systemctl list-units | grep 'v2ray@' | awk -F ' ' '{print $1}')"
   if [[ -z "$XRAY_CUSTOMIZE" ]]; then
-    local xray_daemon_to_stop='xray.service'
+    local xray_daemon_to_stop='v2ray.service'
   else
     local xray_daemon_to_stop="$XRAY_CUSTOMIZE"
   fi
   if ! systemctl stop "$xray_daemon_to_stop"; then
-    echo 'error: Stopping the Xray service failed.'
+    echo 'error: Stopping the v2ray service failed.'
     exit 1
   fi
-  echo 'info: Stop the Xray service.'
+  echo 'info: Stop the v2ray service.'
 }
 
 install_with_logrotate() {
@@ -653,8 +653,8 @@ EOF
       install -d -m 700 -o "$INSTALL_USER_UID" -g "$INSTALL_USER_GID" /etc/logrotate.d/
       LOGROTATE_DIR='1'
   fi
-  cat << EOF > /etc/logrotate.d/xray
-/var/log/xray/*.log {
+  cat << EOF > /etc/logrotate.d/v2ray
+/var/log/v2ray/*.log {
     daily
     missingok
     rotate 7
@@ -685,7 +685,7 @@ install_geodata() {
   local file_site='geosite.dat'
   local dir_tmp
   dir_tmp="$(mktemp -d)"
-  [[ "$XRAY_IS_INSTALLED_BEFORE_RUNNING_SCRIPT" -eq '0' ]] && echo "warning: Xray was not installed"
+  [[ "$XRAY_IS_INSTALLED_BEFORE_RUNNING_SCRIPT" -eq '0' ]] && echo "warning: v2ray was not installed"
   download_geodata $download_link_geoip $file_ip
   download_geodata $download_link_geosite $file_dlc
   cd "${dir_tmp}" || exit
@@ -706,44 +706,44 @@ install_geodata() {
 check_update() {
   if [[ "$XRAY_IS_INSTALLED_BEFORE_RUNNING_SCRIPT" -eq '1' ]]; then
     get_current_version
-    echo "info: The current version of Xray is $CURRENT_VERSION ."
+    echo "info: The current version of v2ray is $CURRENT_VERSION ."
   else
-    echo 'warning: Xray is not installed.'
+    echo 'warning: v2ray is not installed.'
   fi
   get_latest_version
-  echo "info: The latest release version of Xray is $RELEASE_LATEST ."
-  echo "info: The latest pre-release/release version of Xray is $PRE_RELEASE_LATEST ."
+  echo "info: The latest release version of v2ray is $RELEASE_LATEST ."
+  echo "info: The latest pre-release/release version of v2ray is $PRE_RELEASE_LATEST ."
   exit 0
 }
 
 remove_xray() {
-  if systemctl list-unit-files | grep -qw 'xray'; then
+  if systemctl list-unit-files | grep -qw 'v2ray'; then
     if [[ -n "$(pidof xray)" ]]; then
       stop_xray
     fi
     local delete_files=('/usr/local/lib/v2ray' '/etc/systemd/system/v2ray.service' '/etc/systemd/system/v2ray@.service' '/etc/systemd/system/v2ray.service.d' '/etc/systemd/system/v2ray@.service.d')
     [[ -d "$DAT_PATH" ]] && delete_files+=("$DAT_PATH")
-    [[ -f '/etc/logrotate.d/xray' ]] && delete_files+=('/etc/logrotate.d/xray')
+    [[ -f '/etc/logrotate.d/v2ray' ]] && delete_files+=('/etc/logrotate.d/v2ray')
     if [[ "$PURGE" -eq '1' ]]; then
       if [[ -z "$JSONS_PATH" ]]; then
         delete_files+=("$JSON_PATH")
       else
         delete_files+=("$JSONS_PATH")
       fi
-      [[ -d '/var/log/xray' ]] && delete_files+=('/var/log/xray')
+      [[ -d '/var/log/v2ray' ]] && delete_files+=('/var/log/v2ray')
       [[ -f '/etc/systemd/system/logrotate@.service' ]] && delete_files+=('/etc/systemd/system/logrotate@.service')
       [[ -f '/etc/systemd/system/logrotate@.timer' ]] && delete_files+=('/etc/systemd/system/logrotate@.timer')
     fi
-    systemctl disable xray
+    systemctl disable v2ray
     if [[ -f '/etc/systemd/system/logrotate@.timer' ]] ; then
-      if ! systemctl stop logrotate@xray.timer && systemctl disable logrotate@xray.timer ; then
+      if ! systemctl stop logrotate@v2ray.timer && systemctl disable logrotate@v2ray.timer ; then
         echo 'error: Stopping and disabling the logrotate service failed.'
         exit 1
       fi
       echo 'info: Stop and disable the logrotate service.'
     fi
     if ! ("rm" -r "${delete_files[@]}"); then
-      echo 'error: Failed to remove Xray.'
+      echo 'error: Failed to remove v2ray.'
       exit 1
     else
       for i in "${!delete_files[@]}"
@@ -752,19 +752,19 @@ remove_xray() {
       done
       systemctl daemon-reload
       echo "You may need to execute a command to remove dependent software: $PACKAGE_MANAGEMENT_REMOVE curl unzip"
-      echo 'info: Xray has been removed.'
+      echo 'info: v2ray has been removed.'
       if [[ "$PURGE" -eq '0' ]]; then
         echo 'info: If necessary, manually delete the configuration and log files.'
         if [[ -n "$JSONS_PATH" ]]; then
-          echo "info: e.g., $JSONS_PATH and /var/log/xray/ ..."
+          echo "info: e.g., $JSONS_PATH and /var/log/v2ray/ ..."
         else
-          echo "info: e.g., $JSON_PATH and /var/log/xray/ ..."
+          echo "info: e.g., $JSON_PATH and /var/log/v2ray/ ..."
         fi
       fi
       exit 0
     fi
   else
-    echo 'error: Xray is not installed.'
+    echo 'error: v2ray is not installed.'
     exit 1
   fi
 }
@@ -879,7 +879,7 @@ main() {
   fi
 
   # Determine if Xray is running
-  if systemctl list-unit-files | grep -qw 'xray'; then
+  if systemctl list-unit-files | grep -qw 'v2ray'; then
     if [[ -n "$(pidof xray)" ]]; then
       stop_xray
       XRAY_RUNNING='1'
@@ -909,9 +909,9 @@ main() {
     echo "installed: ${JSON_PATH}/09_reverse.json"
   fi
   if [[ "$LOG" -eq '1' ]]; then
-    echo 'installed: /var/log/xray/'
-    echo 'installed: /var/log/xray/access.log'
-    echo 'installed: /var/log/xray/error.log'
+    echo 'installed: /var/log/v2ray/'
+    echo 'installed: /var/log/v2ray/access.log'
+    echo 'installed: /var/log/v2ray/error.log'
   fi
   if [[ "$LOGROTATE_FIN" -eq '1' ]]; then
     echo 'installed: /etc/systemd/system/logrotate@.service'
@@ -919,14 +919,14 @@ main() {
     if [[ "$LOGROTATE_DIR" -eq '1' ]]; then
     echo 'installed: /etc/logrotate.d/'
     fi
-    echo 'installed: /etc/logrotate.d/xray'
-    systemctl start logrotate@xray.timer
-    systemctl enable logrotate@xray.timer
+    echo 'installed: /etc/logrotate.d/v2ray'
+    systemctl start logrotate@v2ray.timer
+    systemctl enable logrotate@v2ray.timer
     sleep 1s
-    if systemctl -q is-active logrotate@xray.timer; then
-      echo "info: Enable and start the logrotate@xray.timer service"
+    if systemctl -q is-active logrotate@v2ray.timer; then
+      echo "info: Enable and start the logrotate@v2ray.timer service"
     else
-      echo "warning: Failed to enable and start the logrotate@xray.timer service"
+      echo "warning: Failed to enable and start the logrotate@v2ray.timer service"
     fi
   fi
   if [[ "$SYSTEMD" -eq '1' ]]; then
@@ -936,18 +936,18 @@ main() {
   "rm" -r "$TMP_DIRECTORY"
   echo "removed: $TMP_DIRECTORY"
   get_current_version
-  echo "info: Xray $CURRENT_VERSION is installed."
+  echo "info: v2ray $CURRENT_VERSION is installed."
   echo "You may need to execute a command to remove dependent software: $PACKAGE_MANAGEMENT_REMOVE curl unzip"
   if [[ "$XRAY_IS_INSTALLED_BEFORE_RUNNING_SCRIPT" -eq '1' ]] && [[ "$FORCE" -eq '0' ]] && [[ "$REINSTALL" -eq '0' ]]; then
     [[ "$XRAY_RUNNING" -eq '1' ]] && start_xray
   else
-    systemctl start xray
-    systemctl enable xray
+    systemctl start v2ray
+    systemctl enable v2ray
     sleep 1s
-    if systemctl -q is-active xray; then
-      echo "info: Enable and start the Xray service"
+    if systemctl -q is-active v2ray; then
+      echo "info: Enable and start the v2ray service"
     else
-      echo "warning: Failed to enable and start the Xray service"
+      echo "warning: Failed to enable and start the v2ray service"
     fi
   fi
 }
