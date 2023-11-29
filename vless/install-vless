@@ -86,13 +86,13 @@ function system_check() {
     print_ok "The current system is Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
     ${INS} wget
-    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/${github_branch}/nginx.repo
+    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/nginx.repo
 
 
   elif [[ "${ID}" == "ol" ]]; then
     print_ok "The current system is Oracle Linux ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
-    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/${github_branch}/nginx.repo
+    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "The current system is Debian ${VERSION_ID} ${VERSION}"
     INS="apt install -y"
@@ -209,7 +209,7 @@ function dependency_install() {
   ${INS} jq
 
   if ! command -v jq; then
-    wget -P /usr/bin https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/${github_branch}/jq && chmod +x /usr/bin/jq
+    wget -P /usr/bin https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/jq && chmod +x /usr/bin/jq
     judge "Install jq"
   fi
 
@@ -290,13 +290,13 @@ function port_exist_check() {
   fi
 }
 function update_sh() {
-  ol_version=$(curl -L -s https://raw.githubusercontent.com/EskalarteDexter/onlineupdate/main/mtk/v2ray/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
+  ol_version=$(curl -L -s https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
   if [[ "$shell_version" != "$(echo -e "$shell_version\n$ol_version" | sort -rV | head -1)" ]]; then
     print_ok "New version exists, update [Y/N]?"
     read -r update_confirm
     case $update_confirm in
     [yY][eE][sS] | [yY])
-      wget -N --no-check-certificate https://raw.githubusercontent.com/EskalarteDexter/onlineupdate/main/mtk/v2ray/install.sh
+      wget -N --no-check-certificate https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/install.sh
       print_ok "update completed"
       print_ok "You can execute this program through bash $0"
       exit 0
@@ -344,7 +344,7 @@ function modify_ws() {
 
 function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/${github_branch}/web.conf
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/web.conf
   sed -i "s/xxx/${domain}/g" ${nginx_conf}
   judge "Nginx configuration modify"
   
@@ -366,13 +366,13 @@ function modify_port() {
 }
 
 function configure_xray() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/${github_branch}/xray_xtls-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/xray_xtls-rprx-direct.json
   modify_UUID
   modify_port
 }
 
 function configure_xray_ws() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/${github_branch}/xray_tls_ws_mix-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/xray_tls_ws_mix-rprx-direct.json
   modify_UUID
   modify_UUID_ws
   modify_port
@@ -382,7 +382,7 @@ function configure_xray_ws() {
 
 function xray_install() {
   print_ok "Install Xray"
-  curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- install
+  curl -L https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/install-release.sh | bash -s -- install
   judge "Xray installation"
 
   # Import link for generating Xray
@@ -502,7 +502,7 @@ function configure_web() {
   read -r webpage
   case $webpage in
   [yY][eE][sS] | [yY])
-    wget -O web.tar.gz https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/main/web.tar.gz
+    wget -O web.tar.gz https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/web.tar.gz
     tar xzf web.tar.gz -C /www/xray_web
     judge "site masquerading"
     rm -f web.tar.gz
@@ -512,7 +512,7 @@ function configure_web() {
 }
 
 function xray_uninstall() {
-  curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- remove --purge
+  curl -L https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/install-release.sh | bash -s -- remove --purge
   rm -rf $website_dir
   print_ok "Whether to uninstall nginx [Y/N] installed?"
   read -r uninstall_nginx
@@ -650,11 +650,11 @@ function show_error_log() {
 
 function bbr_boost_sh() {
   [ -f "tcp.sh" ] && rm -rf ./tcp.sh
-  wget -N --no-check-certificate "https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/main/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
+  wget -N --no-check-certificate "https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
 }
 
 function mtproxy_sh() {
-  wget -N --no-check-certificate "https://raw.githubusercontent.com/EskalarteDexter/V2rayFiles/main/mtproxy.sh" && chmod +x mtproxy.sh && bash mtproxy.sh
+  wget -N --no-check-certificate "https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/vless/file/mtproxy.sh" && chmod +x mtproxy.sh && bash mtproxy.sh
 }
 
 function install_xray() {
@@ -710,31 +710,18 @@ $RESET"
   echo -e ""
   echo -e "—————————————— Installation Guide ——————————————"
   echo -e ""
-  echo -e "${Green}0.${Font}  Upgrade Script"
-  echo -e "${Green}1.${Font}  Install Xray (VLESS + TCP + XTLS / TLS + Nginx)"
-  echo -e "${Green}2.${Font}  Install Xray (VLESS + TCP + XTLS / TLS + Nginx and VLESS + TCP + TLS + Nginx + WebSocket)"
+  echo -e "${Green}1.${Font}  Install Xray (VLESS + TCP + XTLS / TLS + Nginx and VLESS + TCP + TLS + Nginx + WebSocket)"
   echo -e ""
   echo -e "—————————————— Configuration Changes ————————————"
-  echo -e ""
-  echo -e "${Green}3.${Font} Change UUID"
-  echo -e "${Green}4.${Font} Change connection port"
-  echo -e "${Green}5.${Font} Change WebSocket PATH"
+  echo -e "${Green}2.${Font} Change WebSocket PATH"
   echo -e ""
   echo -e "————————————— View information ————————————"
-  echo -e ""
-  echo -e "${Green}6.${Font} View real-time access log"
-  echo -e "${Green}7.${Font} View real-time error log"
-  echo -e "${Green}8.${Font} View Xray configuration link"
+  echo -e "${Green}3.${Font} View Xray configuration link"
   echo -e ""
   echo -e "—————————————— Other options ————————————"
   echo -e ""
-  echo -e "${Green}9.${Font}  Install 4-in-1 BBR, sharp speed installation script"
-  echo -e "${Green}10.${Font} Install MTproxy (not recommended, please close or uninstall relevant users)"
-  echo -e "${Green}11.${Font} Uninstall Xray"
-  echo -e "${Green}12.${Font} Update Xray-core"
-  echo -e "${Green}13.${Font} Install Xray-core Beta (Pre)"
-  echo -e "${Green}14.${Font} Manually renew SSL certificate"
-  echo -e "${Green}15.${Font} Exit"
+  echo -e "${Green}4.${Font}  Install 4-in-1 BBR, sharp speed installation script"
+  echo -e "${Green}5.${Font} Exit"
   echo -e ""
   read -rp "Please enter the number (Default 2)：" menu_num
   case $menu_num in
@@ -742,27 +729,10 @@ $RESET"
     update_sh
     ;;
   1)
-    install_xray
-    ;;
-  2)
     install_xray_ws
     ;;
-  3)
-    read -rp "please enter UUID:" UUID
-    if [[ ${shell_mode} == "tcp" ]]; then
-      modify_UUID
-    elif [[ ${shell_mode} == "ws" ]]; then
-      modify_UUID
-      modify_UUID_ws
-    fi
-    restart_all
-    ;;
-  4)
-    modify_port
-    restart_all
-    ;;
-  5)
-    if [[ ${shell_mode} == "ws" ]]; then
+  2)
+   if [[ ${shell_mode} == "ws" ]]; then
       read -rp "Please enter the path (example：/dexterpogi/ Requires both sides to contain /):" WS_PATH
       modify_fallback_ws
       modify_ws
@@ -771,13 +741,7 @@ $RESET"
       print_error "The current mode is not Websocket mode"
     fi
     ;;
-  6)
-    tail -f $xray_access_log
-    ;;
-  7)
-    tail -f $xray_error_log
-    ;;
-  8)
+  3)
     if [[ -f $xray_conf_dir/config.json ]]; then
       if [[ ${shell_mode} == "tcp" ]]; then
         basic_information
@@ -788,29 +752,10 @@ $RESET"
       print_error "xray configuration file does not exist"
     fi
     ;;
-  9)
+  4)
     bbr_boost_sh
     ;;
-  10)
-    mtproxy_sh
-    ;;
-  11)
-    source '/etc/os-release'
-    xray_uninstall
-    ;;
-  12)
-    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" - install
-    restart_all
-    ;;
-  13)
-    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" - install --beta
-    restart_all
-    ;;
-  14)
-    "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh"
-    restart_all
-    ;;
-  15)
+  5)
     exit 0
     ;;
   *)
