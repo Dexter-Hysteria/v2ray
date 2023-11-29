@@ -312,12 +312,12 @@ v2ray_install() {
     fi
     mkdir -p /root/v2ray
     cd /root/v2ray || exit
-    wget -N --no-check-certificate https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/tls/v2.sh
+    wget -N --no-check-certificate https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/server_script/tls/v2service.sh
 
-    if [[ -f v2.sh ]]; then
+    if [[ -f v2service.sh ]]; then
         rm -rf $v2ray_systemd_file
         systemctl daemon-reload
-        bash v2.sh --force
+        bash v2service.sh --force
         judge "Install V2ray"
     else
         echo -e "${Error} ${RedBG} V2ray installation file download failed, please check if the download address is available ${Font}"
@@ -1022,7 +1022,7 @@ echo -e " \033[0;35m════════════════════
         install_v2_h2
         ;;
     3)
-        bash <(curl -L -s https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/${github_branch}/tls/v2ray.sh)
+        bash <(curl -L -s https://raw.githubusercontent.com/Dexter-Hysteria/v2ray/${github_branch}/tls/v2service.sh)
         ;;
     4)
         read -rp "Please enter UUID:" UUID
