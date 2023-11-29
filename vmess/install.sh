@@ -9,8 +9,8 @@
 #	Official document: www.v2ray.com
 #====================================================
 
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-stty erase ^?
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
 cd "$(
     cd "$(dirname "$0")" || exit
