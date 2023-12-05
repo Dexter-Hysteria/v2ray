@@ -597,16 +597,9 @@ if [[ "$switchVmess" == [yY] ]]; then
     | base64 -w 0)"
 
     echo -e "${cyan}${v2ray_vmess_url}${none}"
-    echo -e "The following two QR codes have exactly the same content"
-    echo -e ""
-    echo "---------- END -------------"
-    echo $v2ray_vmess_url > ~/_v2ray_vmess_url_
-    echo -e ""
-	echo -e ""
-    echo -e ""
     echo "=== IPv6 Tunnel to IPv4 ==="
     echo
-    sleep 1
+    sleep 3
 
     #Restart V2Ray
     echo
