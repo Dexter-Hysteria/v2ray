@@ -1,5 +1,4 @@
 #!/bin/bash -e
-echo
 echo -e "$GREEN
   
    ██████╗ ███████╗██╗  ██╗████████╗███████╗██████╗ 
@@ -598,35 +597,19 @@ if [[ "$switchVmess" == [yY] ]]; then
     | base64 -w 0)"
 
     echo -e "${cyan}${v2ray_vmess_url}${none}"
-    echo  "The following two QR codes have exactly the same content"
-    echo
+    echo -e "The following two QR codes have exactly the same content"
+    echo -e ""
     echo "---------- END -------------"
-    echo  "The above node information is saved in ~/_v2ray_vmess_url_"
-
+    echo -e "The above node information is saved in ~/_v2ray_vmess_url_"
+    echo -e ""
     echo $v2ray_vmess_url > ~/_v2ray_vmess_url_
     echo  "The following two QR codes have exactly the same content"  >>  ~ /_v2ray_vmess_url_
-    
-elif [[ "$switchVmess" == [nN] ]]; then
+    echo -e ""
+	echo -e ""
+    echo -e ""
+    echo "=== IPv6 Tunnel to IPv4 ==="
     echo
-else
-    error
-fi
-
-echo
-echo "=== IPv6 Tunnel to IPv4 ==="
-echo
-sleep 1
-
-# If IPv6 , create IPv4 outbound with WARP
-if [[ $netstack == "6" ]]; then
-    echo
-    echo -e "$yellow this is an IPv6 , create IPv4 outbound with WARP $none"
-    echo  "Telegram accesses IPv4 addresses directly, and requires IPv4 outbound capabilities"
-    echo "----------------------------------------------------------------"
-    pause
-
-    # install warp ipv4
-    #bash <(curl -L git.io/warp.sh) 4
+    sleep 1
 
     #Restart V2Ray
     echo
@@ -640,37 +623,7 @@ if [[ $netstack == "6" ]]; then
     echo "----------------------------------------------------------------"
     service caddy restart
 
-echo
-echo "=== IPv4 Tunnel for IPv6 ==="
-echo
-sleep 1
-
-# If IPv4 , create IPv6 outbound with WARP
-elif  [[ $netstack == "4" ]]; then
-    echo
-    echo -e "$yellow This is an IPv4 , create IPv6 outbound with WARP $none"
-    echo -e "Some popular s use native IPv4 outbound to access Google and need to pass man-machine verification, which can be solved by modifying config.json to specify that google traffic go through WARP's IPv6 outbound"
-    echo "----------------------------------------------------------------"
-    pause
-
-    # install warp ipv6
-    #bash <(curl -L git.io/warp.sh) 6
-
-    #Restart V2Ray
-    echo
-    echo -e "$yellow restart V2Ray $none"
-    echo "----------------------------------------------------------------"
-    service v2ray restart
-
-    #Restart CaddyV2
-    echo
-    echo -e "$yellow restart CaddyV2 $none"
-    echo "----------------------------------------------------------------"
-    service caddy restart
-
-fi
-
-echo
-echo "=== Finished ==="
-echo
-sleep 1
+    echo -e ""
+    echo "=== Finished ==="
+    echo -e ""
+    sleep 1
