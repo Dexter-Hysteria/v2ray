@@ -596,6 +596,8 @@ if [[ "$switchVmess" == [yY] ]]; then
 }"\
     | base64 -w 0)"
 
+fi
+
     echo -e "${cyan}${v2ray_vmess_url}${none}"
     echo "=== IPv6 Tunnel to IPv4 ==="
     echo
