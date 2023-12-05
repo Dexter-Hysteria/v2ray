@@ -595,6 +595,7 @@ if [[ "$switchVmess" == [yY] ]]; then
 \"tls\": \"tls\"\
 }"\
     | base64 -w 0)"
+fi
 
     echo -e "${cyan}${v2ray_vmess_url}${none}"
     echo -e "The following two QR codes have exactly the same content"
