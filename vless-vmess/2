@@ -579,6 +579,8 @@ if [[ "$switchVmess" == [yY] ]]; then
     service v2ray restart
     
     #Generate vmess link and QR code
+	echo -e ""
+	echo -e ""
     echo "---------- V2Ray Vmess URL ----------"
     v2ray_vmess_url="vmess://$(echo -n "\
 {\
@@ -595,31 +597,18 @@ if [[ "$switchVmess" == [yY] ]]; then
 \"tls\": \"tls\"\
 }"\
     | base64 -w 0)"
-fi
 
-    echo -e "${cyan}${v2ray_vmess_url}${none}"
-    echo -e "The following two QR codes have exactly the same content"
-    echo -e ""
-    echo "---------- END -------------"
-    echo -e "The above node information is saved in ~/_v2ray_vmess_url_"
-    echo -e ""
-    echo $v2ray_vmess_url > ~/_v2ray_vmess_url_
-    echo  "The following two QR codes have exactly the same content"  >>  ~ /_v2ray_vmess_url_
-    echo -e ""
-	echo -e ""
-    echo -e ""
-    echo "=== IPv6 Tunnel to IPv4 ==="
-    echo
-    sleep 1
+    sleep 5
 
     #Restart V2Ray
-    echo
+	echo -e ""
+    echo -e ""
     echo -e "$yellow restart V2Ray $none"
     echo "----------------------------------------------------------------"
     service v2ray restart
 
     #Restart CaddyV2
-    echo
+    echo -e ""
     echo -e "$yellow restart CaddyV2 $none"
     echo "----------------------------------------------------------------"
     service caddy restart
