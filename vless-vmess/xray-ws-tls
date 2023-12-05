@@ -1,10 +1,24 @@
 #!/bin/bash -e
-echo
-echo "=== azadrah.org ==="
-echo "=== https://github.com/azadrah-org ==="
-echo "=== V2ray with Caddy [Vless/Vmess+WS+TLS] (Ubuntu 22.04) ==="
-echo
-sleep 3
+# font color configuration
+Green="\033[32m"
+Red="\033[31m"
+Yellow="\033[33m"
+Blue="\033[36m"
+Font="\033[0m"
+GreenBG="\033[42;37m"
+RedBG="\033[41;37m"
+OK="${Green}[OK]${Font}"
+ERROR="${Red}[ERROR]${Font}"
+
+echo -e "$GREEN
+  
+   ██████╗ ███████╗██╗  ██╗████████╗███████╗██████╗ 
+   ██╔══██╗██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗
+   ██║  ██║█████╗   ╚███╔╝    ██║   █████╗  ██████╔╝
+   ██║  ██║██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗
+   ██████╔╝███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║
+   ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝		
+$RESET"
 
 red='\e[91m'
 green='\e[92m'
@@ -531,7 +545,6 @@ echo
 echo -e "$yellow restart CaddyV2$none"
 echo "----------------------------------------------------------------"
 service caddy restart
-
 echo
 echo
 echo  "---------- V2Ray configuration information-------------"
@@ -591,6 +604,7 @@ else
 fi
 
 service v2ray restart
+service caddy restart
 echo
 echo "=== Finished ==="
 echo
