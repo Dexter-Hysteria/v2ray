@@ -1,24 +1,10 @@
 #!/bin/bash -e
-# font color configuration
-Green="\033[32m"
-Red="\033[31m"
-Yellow="\033[33m"
-Blue="\033[36m"
-Font="\033[0m"
-GreenBG="\033[42;37m"
-RedBG="\033[41;37m"
-OK="${Green}[OK]${Font}"
-ERROR="${Red}[ERROR]${Font}"
-
-echo -e "$GREEN
-  
-   ██████╗ ███████╗██╗  ██╗████████╗███████╗██████╗ 
-   ██╔══██╗██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗
-   ██║  ██║█████╗   ╚███╔╝    ██║   █████╗  ██████╔╝
-   ██║  ██║██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗
-   ██████╔╝███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║
-   ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝		
-$RESET"
+echo
+echo "=== azadrah.org ==="
+echo "=== https://github.com/azadrah-org ==="
+echo "=== V2ray with Caddy [Vless/Vmess+WS+TLS] (Ubuntu 22.04) ==="
+echo
+sleep 3
 
 red='\e[91m'
 green='\e[92m'
@@ -545,6 +531,7 @@ echo
 echo -e "$yellow restart CaddyV2$none"
 echo "----------------------------------------------------------------"
 service caddy restart
+
 echo
 echo
 echo  "---------- V2Ray configuration information-------------"
@@ -565,6 +552,14 @@ v2ray_vless_url="vless://${v2ray_id}@${domain}:443?encryption=none&security=tls&
 echo -e "${cyan}${v2ray_vless_url}${none}"
 echo
 sleep 3
+
+# Save the node information to the file
+echo $v2ray_vless_url > ~/_v2ray_vless_url_
+echo  " The following two QR codes have exactly the same content "  >>  ~ /_v2ray_vless_url_
+echo
+echo "=== Change to Vmess ==="
+echo
+sleep 1
 
 #Whether to switch to vmess protocol
 echo 
@@ -596,15 +591,80 @@ if [[ "$switchVmess" == [yY] ]]; then
 \"tls\": \"tls\"\
 }"\
     | base64 -w 0)"
- 
+
+    echo -e "${cyan}${v2ray_vmess_url}${none}"
+    echo  "The following two QR codes have exactly the same content"
+    echo
+    echo "---------- END -------------"
+    echo  "The above node information is saved in ~/_v2ray_vmess_url_"
+
+    echo $v2ray_vmess_url > ~/_v2ray_vmess_url_
+    echo  "The following two QR codes have exactly the same content"  >>  ~ /_v2ray_vmess_url_
+    
 elif [[ "$switchVmess" == [nN] ]]; then
     echo
 else
     error
 fi
 
-service v2ray restart
-service caddy restart
+echo
+echo "=== IPv6 Tunnel to IPv4 ==="
+echo
+sleep 1
+
+# If IPv6 , create IPv4 outbound with WARP
+if [[ $netstack == "6" ]]; then
+    echo
+    echo -e "$yellow this is an IPv6 , create IPv4 outbound with WARP $none"
+    echo  "Telegram accesses IPv4 addresses directly, and requires IPv4 outbound capabilities"
+    echo "----------------------------------------------------------------"
+    pause
+
+    # install warp ipv4
+    #bash <(curl -L git.io/warp.sh) 4
+
+    #Restart V2Ray
+    echo
+    echo -e "$yellow restart V2Ray $none"
+    echo "----------------------------------------------------------------"
+    service v2ray restart
+
+    #Restart CaddyV2
+    echo
+    echo -e "$yellow restart CaddyV2 $none"
+    echo "----------------------------------------------------------------"
+    service caddy restart
+
+echo
+echo "=== IPv4 Tunnel for IPv6 ==="
+echo
+sleep 1
+
+# If IPv4 , create IPv6 outbound with WARP
+elif  [[ $netstack == "4" ]]; then
+    echo
+    echo -e "$yellow This is an IPv4 , create IPv6 outbound with WARP $none"
+    echo -e "Some popular s use native IPv4 outbound to access Google and need to pass man-machine verification, which can be solved by modifying config.json to specify that google traffic go through WARP's IPv6 outbound"
+    echo "----------------------------------------------------------------"
+    pause
+
+    # install warp ipv6
+    #bash <(curl -L git.io/warp.sh) 6
+
+    #Restart V2Ray
+    echo
+    echo -e "$yellow restart V2Ray $none"
+    echo "----------------------------------------------------------------"
+    service v2ray restart
+
+    #Restart CaddyV2
+    echo
+    echo -e "$yellow restart CaddyV2 $none"
+    echo "----------------------------------------------------------------"
+    service caddy restart
+
+fi
+
 echo
 echo "=== Finished ==="
 echo
