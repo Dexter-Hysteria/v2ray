@@ -1538,35 +1538,36 @@ checkPort() {
 }
 
 installTLS() {
-    echoContent skyBlue "\nProgress $1/${totalProgress}: Apply for TLS certificate\n"
+    echoContent skyBlue "\n进度  $1/${totalProgress} : 申请TLS证书\n"
     readAcmeTLS
     local tlsDomain=${domain}
 
-    if [[ -f "/etc/v2ray-agent/tls/${tlsDomain}.crt" && -f "/etc/v2ray-agent/tls/${tlsDomain}.key" && -n $(cat "/ etc/v2ray-agent/tls/${tlsDomain}.crt") ]] || [[ -d "$HOME/.acme.sh/${tlsDomain}_ecc" && -f "$HOME/.acme.sh /${tlsDomain}_ecc/${tlsDomain}.key" && -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.cer" ]] || [[ "${installedDNSAPIStatus} " == "true" ]]; then
-        echoContent green " ---> Certificate detected"
+    # 安装tls
+    if [[ -f "/etc/v2ray-agent/tls/${tlsDomain}.crt" && -f "/etc/v2ray-agent/tls/${tlsDomain}.key" && -n $(cat "/etc/v2ray-agent/tls/${tlsDomain}.crt") ]] || [[ -d "$HOME/.acme.sh/${tlsDomain}_ecc" && -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.key" && -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.cer" ]] || [[ "${installedDNSAPIStatus}" == "true" ]]; then
+        echoContent green " ---> 检测到证书"
         renewalTLS
 
         if [[ -z $(find /etc/v2ray-agent/tls/ -name "${tlsDomain}.crt") ]] || [[ -z $(find /etc/v2ray-agent/tls/ -name "${tlsDomain}.key") ]] || [[ -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.crt") ]]; then
             if [[ "${installedDNSAPIStatus}" == "true" ]]; then
                 sudo "$HOME/.acme.sh/acme.sh" --installcert -d "*.${dnsTLSDomain}" --fullchainpath "/etc/v2ray-agent/tls/${tlsDomain}.crt" --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
             else
-                sudo "$HOME/.acme.sh/acme.sh" --installcert -d "${tlsDomain}" --fullchainpath "/etc/v2ray-agent/tls/${tlsDomain}.crt" --keypath "/ etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
+                sudo "$HOME/.acme.sh/acme.sh" --installcert -d "${tlsDomain}" --fullchainpath "/etc/v2ray-agent/tls/${tlsDomain}.crt" --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
             fi
 
         else
-            echoContent yellow " ---> If the certificate has not expired or is customized, please select [n]\n"
-            read -r -p "Reinstall? [y/n]:" reInstallStatus
+            echoContent yellow " ---> 如未过期或者自定义证书请选择[n]\n"
+            read -r -p "是否重新安装？[y/n]:" reInstallStatus
             if [[ "${reInstallStatus}" == "y" ]]; then
                 rm -rf /etc/v2ray-agent/tls/*
                 installTLS "$1"
             fi
         fi
 
-    elif [[ -d "$HOME/.acme.sh" ]] && [[ ! -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.cer" || ! -f " $HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.key" ]]; then
+    elif [[ -d "$HOME/.acme.sh" ]] && [[ ! -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.cer" || ! -f "$HOME/.acme.sh/${tlsDomain}_ecc/${tlsDomain}.key" ]]; then
         switchDNSAPI
         if [[ -z "${dnsAPIType}" ]]; then
-            echoContent yellow "\n ---> Do not use API to apply for certificate"
-            echoContent green " ---> Install TLS certificate, need to rely on port 80"
+            echoContent yellow "\n ---> 不采用API申请证书"
+            echoContent green " ---> 安装TLS证书，需要依赖80端口"
             allowPort 80
         fi
 
@@ -1580,10 +1581,10 @@ installTLS() {
             sudo "$HOME/.acme.sh/acme.sh" --installcert -d "${tlsDomain}" --fullchainpath "/etc/v2ray-agent/tls/${tlsDomain}.crt" --keypath "/etc/v2ray-agent/tls/${tlsDomain}.key" --ecc >/dev/null
         fi
 
-        if [[ ! -f "/etc/v2ray-agent/tls/${tlsDomain}.crt" || ! -f "/etc/v2ray-agent/tls/${tlsDomain}.key" ]] || [ [ -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.key") || -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.crt") ] ]; then
+        if [[ ! -f "/etc/v2ray-agent/tls/${tlsDomain}.crt" || ! -f "/etc/v2ray-agent/tls/${tlsDomain}.key" ]] || [[ -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.key") || -z $(cat "/etc/v2ray-agent/tls/${tlsDomain}.crt") ]]; then
             tail -n 10 /etc/v2ray-agent/tls/acme.log
             if [[ ${installTLSCount} == "1" ]]; then
-                echoContent red " ---> TLS installation failed, please check the acme log"
+                echoContent red " ---> TLS安装失败，请检查acme日志"
                 exit 0
             fi
 
@@ -1591,7 +1592,7 @@ installTLS() {
             echo
 
             if tail -n 10 /etc/v2ray-agent/tls/acme.log | grep -q "Could not validate email address as valid"; then
-                echoContent red " ---> The email cannot pass SSL vendor verification, please re-enter"
+                echoContent red " ---> 邮箱无法通过SSL厂商验证，请重新输入"
                 echo
                 customSSLEmail "validate email"
                 installTLS "$1"
@@ -1600,9 +1601,9 @@ installTLS() {
             fi
         fi
 
-        echoContent green " ---> TLS generated successfully"
+        echoContent green " ---> TLS生成成功"
     else
-        echoContent yellow " ---> acme.sh is not installed"
+        echoContent yellow " ---> 未安装acme.sh"
         exit 0
     fi
 }
