@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-# 检测区
-# -------------------------------------------------------------
-# 检查系统
+
 export LANG=en_US.UTF-8
 
 echoContent() {
     case $1 in
-    # 红色
     "red")
         # shellcheck disable=SC2154
         ${echoType} "\033[31m${printN}$2 \033[0m"
@@ -32,6 +29,7 @@ echoContent() {
         ;;
     esac
 }
+
 
 checkCentosSELinux() {
     if [[ -f "/etc/selinux/config" ]] && ! grep -q "SELINUX=disabled" <"/etc/selinux/config"; then
@@ -126,62 +124,171 @@ initVar() {
     removeType='yum -y remove'
     upgrade="yum -y update"
     echoType='echo -e'
+
+    # 核心支持的cpu版本
     xrayCoreCPUVendor=""
     v2rayCoreCPUVendor=""
     hysteriaCoreCPUVendor=""
     warpRegCoreCPUVendor=""
     cpuVendor=""
 
-
+    # 域名
     domain=
+
+    # CDN节点的address
     add=
+
+    # 安装总进度
     totalProgress=1
+
+    # 1.xray-core安装
+    # 2.v2ray-core 安装
+    # 3.v2ray-core[xtls] 安装
     coreInstallType=
+
+    # 核心安装path
+    # coreInstallPath=
+
+    # v2ctl Path
     ctlPath=
+    # 1.全部安装
+    # 2.个性化安装
+    # v2rayAgentInstallType=
+
+    # 当前的个性化安装方式 01234
     currentInstallProtocolType=
+
+    # 当前alpn的顺序
     currentAlpn=
+
+    # 前置类型
     frontingType=
+
+    # 选择的个性化安装方式
     selectCustomInstallType=
+
+    # v2ray-core、xray-core配置文件的路径
     configPath=
+
+    # xray-core reality状态
     realityStatus=
+
+    # hysteria 配置文件的路径
     hysteriaConfigPath=
+
+    # sing-box配置文件路径
     singBoxConfigPath=
+    #    interfaceName=
+    # 端口跳跃
     portHoppingStart=
     portHoppingEnd=
     portHopping=
+
+    # tuic配置文件路径
     tuicConfigPath=
     tuicAlgorithm=
     tuicPort=
+
+    # 配置文件的path
     currentPath=
+
+    # 配置文件的host
     currentHost=
+
+    # 安装时选择的core类型
     selectCoreType=
+
+    # 默认core版本
     v2rayCoreVersion=
+
+    # 随机路径
     customPath=
+
+    # centos version
     centosVersion=
+
+    # UUID
     currentUUID=
+
+    # clients
     currentClients=
+
+    # previousClients
     previousClients=
+
     localIP=
+
+    # 定时任务执行任务名称 RenewTLS-更新证书 UpdateGeo-更新geo文件
     cronName=$1
+
+    # tls安装失败后尝试的次数
     installTLSCount=
+
+    # BTPanel状态
+    #	BTPanelStatus=
+    # 宝塔域名
     btDomain=
+    # nginx配置文件路径
     nginxConfigPath=/etc/nginx/conf.d/
     nginxStaticPath=/usr/share/nginx/html/
+
+    # 是否为预览版
     prereleaseStatus=false
+
+    # ssl类型
     sslType=
+    # SSL CF API Token
     cfAPIToken=
+
+    # ssl邮箱
     sslEmail=
+
+    # 检查天数
     sslRenewalDays=90
+
+    # dns ssl状态
+    #    dnsSSLStatus=
+
+    # dns tls domain
     dnsTLSDomain=
+
+    # 该域名是否通过dns安装通配符证书
+    #    installDNSACMEStatus=
+
+    # 自定义端口
     customPort=
+
+    # hysteria端口
     hysteriaPort=
+
+    # hysteria协议
     hysteriaProtocol=
+
+    # hysteria延迟
+    #    hysteriaLag=
+
+    # hysteria下行速度
     hysteria2ClientDownloadSpeed=
+
+    # hysteria上行速度
     hysteria2ClientUploadSpeed=
+
+    # Reality
     realityPrivateKey=
     realityServerNames=
     realityDestDomain=
+
+    # 端口状态
+    #    isPortOpen=
+    # 通配符域名状态
+    #    wildcardDomainStatus=
+    # 通过nginx检查的端口
+    #    nginxIPort=
+
+    # wget show progress
     wgetShowProgressStatus=
+
+    # warp
     reservedWarpReg=
     publicKeyWarpReg=
     addressWarpReg=
@@ -2458,6 +2565,7 @@ initXrayClients() {
     done < <(echo "${currentClients}" | jq -c '.[]')
     echo "${users}"
 }
+
 getClients() {
     local path=$1
 
@@ -2487,6 +2595,7 @@ addClients() {
         echo "${config}" | jq . >"${path}"
     fi
 }
+
 # 添加hysteria配置
 addClientsHysteria() {
     local path=$1
@@ -6513,7 +6622,8 @@ dnsRouting() {
     2)
         removeUnlockDNS
         ;;
-    esac}
+    esac
+}
 
 
 sniRouting() {
