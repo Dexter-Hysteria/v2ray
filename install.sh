@@ -1,9 +1,12 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
+# 检测区
+# -------------------------------------------------------------
+# 检查系统
 export LANG=en_US.UTF-8
 
 echoContent() {
     case $1 in
+    # 红色
     "red")
         # shellcheck disable=SC2154
         ${echoType} "\033[31m${printN}$2 \033[0m"
@@ -29,7 +32,6 @@ echoContent() {
         ;;
     esac
 }
-
 
 checkCentosSELinux() {
     if [[ -f "/etc/selinux/config" ]] && ! grep -q "SELINUX=disabled" <"/etc/selinux/config"; then
