@@ -113,8 +113,8 @@ checkCPUVendor() {
         fi
     else
         echoContent red "This CPU architecture cannot be recognized, the default is amd64, x86_64--->"
-        xrayCoreCPUVendor="Xray-linux-64"
-        v2rayCoreCPUVendor="v2ray-linux-64"
+        #xrayCoreCPUVendor="Xray-linux-64"
+        #v2rayCoreCPUVendor="v2ray-linux-64"
     fi
 }
 
@@ -303,8 +303,8 @@ readAcmeTLS() {
     else
         readAcmeDomain="${domain}"
     fi
-    dnsTLSDomain=$(echo "${readAcmeDomain}" | awk -F "." '{$1="";print $0}' | sed 's/^[[:space:]]*//' | sed 's/ /./g')
-    if [[ -d "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc" && -f "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.key" && -f "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.cer" ]]; then
+    dnsTLSDomain=$(echo "${readAcmeDomain}" | awk -F "." '{$1="";print $0}' | sed 's/^[[:space:]]*//' | sed 's / /./g')
+    if [[ -d "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc" && -f "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.key " && -f "$HOME/.acme.sh/*.${dnsTLSDomain}_ecc/*.${dnsTLSDomain}.cer" ]]; then
         installedDNSAPIStatus=true
     fi
 }
@@ -1982,14 +1982,14 @@ installXray() {
 
         echoContent green " ---> Xray-core version:${version}"
 
-        wget -c -q "${wgetShowProgressStatus}" -P /etc/v2ray-agent/xray/ "https://github.com/XTLS/Xray-core/releases/download/${version}/${xrayCoreCPUVendor} .zip"
-        if [[ ! -f "/etc/v2ray-agent/xray/${xrayCoreCPUVendor}.zip" ]]; then
+        wget -c -q "${wgetShowProgressStatus}" -P /etc/v2ray-agent/xray/ "https://github.com/XTLS/Xray-core/releases/download/v1.8.6/Xray-linux-64.zip"
+        if [[ ! -f "/etc/v2ray-agent/xray/Xray-linux-64.zip" ]]; then
             echoContent red " ---> Core download failed, please try installation again"
             exit 0
         fi
 
-        unzip -o "/etc/v2ray-agent/xray/${xrayCoreCPUVendor}.zip" -d /etc/v2ray-agent/xray >/dev/null
-        rm -rf "/etc/v2ray-agent/xray/${xrayCoreCPUVendor}.zip"
+        unzip -o "/etc/v2ray-agent/xray/Xray-linux-64.zip" -d /etc/v2ray-agent/xray >/dev/null
+        rm -rf "/etc/v2ray-agent/xray/Xray-linux-64.zip"
 
         version=$(curl -s https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases?per_page=1 | jq -r '.[]|.tag_name')
         echoContent skyBlue "------------------------Version---------------------- ---------"
@@ -2207,10 +2207,10 @@ updateXray() {
 
         echoContent green " ---> Xray-core版本:${version}"
 
-        wget -c -q "${wgetShowProgressStatus}" -P /etc/v2ray-agent/xray/ "https://github.com/XTLS/Xray-core/releases/download/${version}/${xrayCoreCPUVendor}.zip"
+        wget -c -q "${wgetShowProgressStatus}" -P /etc/v2ray-agent/xray/ "https://github.com/XTLS/Xray-core/releases/download/v1.8.6/Xray-linux-64.zip"
 
-        unzip -o "/etc/v2ray-agent/xray/${xrayCoreCPUVendor}.zip" -d /etc/v2ray-agent/xray >/dev/null
-        rm -rf "/etc/v2ray-agent/xray/${xrayCoreCPUVendor}.zip"
+        unzip -o "/etc/v2ray-agent/xray/Xray-linux-64.zip" -d /etc/v2ray-agent/xray >/dev/null
+        rm -rf "/etc/v2ray-agent/xray/Xray-linux-64.zip"
         chmod 655 /etc/v2ray-agent/xray/xray
         handleXray stop
         handleXray start
